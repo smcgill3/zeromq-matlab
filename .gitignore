@@ -15,3 +15,9 @@
 *.exe
 *.out
 *.app
+
+# MATLAB files
+*.mex*
+
+# Other
+*.un~
