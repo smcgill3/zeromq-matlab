@@ -33,4 +33,4 @@ if(sum(recv1==data1)==numel(data1))
 else
 	disp('Bad ipc data!')
 end
-%exit
+exit
