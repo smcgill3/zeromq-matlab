@@ -187,12 +187,24 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 		if( socket_id>socket_cnt )
 			mexErrMsgTxt("Bad socket id!");
 
+		/* If a file descriptor, then return the fd */
+		if( poll_items[socket_id].socket == NULL ){
+			ret_sz[0] = 1;
+			plhs[0] = mxCreateNumericArray(1,ret_sz,mxUINT8_CLASS,mxREAL);
+			uint8_t* out = (uint8_t*)mxGetData(plhs[0]);
+			out[0] = (uint8_t)poll_items[socket_id].fd;
+			plhs[1] = mxCreateNumericArray(1,ret_sz,mxUINT8_CLASS,mxREAL);
+			out = (uint8_t*)mxGetData(plhs[1]);
+			out[0] = 0;
+			return;
+		}
+
 		/* Blocking Receive */
 		int nbytes = zmq_recv(sockets[socket_id], recv_buffer, BUFLEN, 0);
 		/* Non-blocking Receive */
 		/*zmq_recv(sockets[socket], recv_buffer, BUFLEN, ZMQ_DONTWAIT);*/
 		if(nbytes==-1)
-			mexErrMsgTxt("Did not receive anything");
+			mexErrMsgTxt("Did not receive anything from ZMQ");
 		
 		/* Check if multipart */
 		int has_more;
