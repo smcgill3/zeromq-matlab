@@ -5,7 +5,13 @@
 #include <string>
 #include <stdio.h>
 #include <zmq.h>
-#include <unistd.h>
+
+#if defined(_WIN32) || defined(_WIN64)
+  #include <io.h>
+#else
+  #include <unistd.h>
+#endif
+
 #include <stdint.h>
 #include <string.h>
 #include "mex.h"
@@ -13,6 +19,13 @@
 #define BUFLEN 1000000
 /* Do not exceed 255 since indexed by uint8_t */
 #define MAX_SOCKETS 10
+
+#if defined(_WIN32) || defined(_WIN64) 
+  #define snprintf _snprintf 
+  #define vsnprintf _vsnprintf 
+  #define strcasecmp _stricmp 
+  #define strncasecmp _strnicmp 
+#endif
 
 char *command, *protocol, *channel;
 double* port_ptr;
