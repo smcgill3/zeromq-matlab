@@ -3,7 +3,9 @@ zeromq-matlab
 
 ZeroMQ mex bindings for MATLAB.  This version is known to work with ZeroMQ 3.2.2 on Mac OSX 10.8.3 with MATLAB 2012b and on Ubuntu 12.04 with MATLAB 2013a.
 
-Requires ZeroMQ 3.2.2 to be installed first (see below)
+Tested with ZeroMQ 4.0.5 on MATLAB R2015a. TCP needs two different hosts.
+
+Requires ZeroMQ to be installed first (see below)
 
 To build, run "make"
 

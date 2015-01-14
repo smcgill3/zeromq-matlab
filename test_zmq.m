@@ -1,16 +1,20 @@
-% (c) 2013 Stephen McGill
+% (c) 2015 Stephen McGill
 % MATLAB script to test zeromq-matlab
 clear all;
+TEST_TCP = false;
+
 if ~ispc
     p1 = zmq( 'publish',   'ipc', 'matlab' );
     s1 = zmq( 'subscribe', 'ipc', 'matlab' );
 else
     disp('0MQ IPC not supported on windows. Skipping IPC test...')
 end
-disp('Setting up TCP')
-p2 = zmq( 'publish',   'tcp', '*', 5555 );
-pause(.1)
-s2 = zmq( 'subscribe', 'tcp', 'localhost', 5555 );
+
+if TEST_TCP
+    disp('Setting up TCP')
+    s2 = zmq( 'subscribe', 'tcp', '*', 54321 );
+    p2 = zmq( 'publish', 'tcp', '127.0.0.1', 54321 );
+end
 
 data1 = uint8('hello world!')';
 data2 = [81;64;2000];
@@ -23,7 +27,12 @@ if ~ispc
 else
     nbytes1 = 0;
 end
-nbytes2 = zmq( 'send', p2, data2 );
+if TEST_TCP
+    nbytes2 = zmq( 'send', p2, data2 );
+else
+    nbytes2 = 0;
+end
+
 fprintf('\nSent %d and %d bytes for ipc and tcp channels.\n',nbytes1,nbytes2);
 idx = zmq('poll',1000);
 
@@ -49,18 +58,22 @@ end
 
 if ispc
     disp('IPC test skipped!')
-elseif(sum(recv_data1==data1)==numel(data1))
-	disp('IPC test passed!')
 else
-	disp('Bad ipc data!')
+    if numel(data1)==numel(recv_data1) && sum(recv_data1==data1)==numel(data1)
+        disp('IPC PASS');
+    else
+        disp('IPC FAIL');
+    end
 end
 
-if(sum(recv_data2==data2)==numel(data2))
-	disp('TCP test passed!')
-else
-	disp('Bad tcp data!')
+if TEST_TCP
+    if numel(data2)==numel(recv_data2) && sum(recv_data2==data2)==numel(data2)
+        disp('TCP PASS');
+    else
+        disp('TCP FAIL');
+    end
 end
 
-if ~ispc
-    exit
-end
+%if ~ispc
+%    exit
+%end
