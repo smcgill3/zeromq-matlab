@@ -49,23 +49,25 @@ else
 end
 
 if TEST_TCP
+    cnt = 1;
     disp('Setting up TCP')
-    s2 = zmq( 'subscribe', 'tcp', '*', 43210 );
-    p2 = zmq( 'publish', 'tcp', '127.0.0.1', 43210 );
-    data2 = [81;64;2000];
+    s2 = zmq( 'subscribe', 'tcp', '127.0.0.1', 43210 );
+    p2 = zmq( 'publish', 'tcp', 43210 );
+    data2 = uint8(sprintf('#%d: %d', cnt, randi(9)));
     zmq('poll', 1000);
     nbytes2 = zmq( 'send', p2, data2 );
     idx = zmq('poll', 1000);
     [recv_data,has_more] = zmq( 'receive', idx );
     disp( 'tcp channel receiving...' );
-    recv_data2 = typecast(recv_data,'double');
-    disp( recv_data2' );
+    recv_data2 = char(recv_data');
+    disp( recv_data2 );
     
     if numel(data2)==numel(recv_data2) && sum(recv_data2==data2)==numel(data2)
         disp('TCP PASS');
     else
         disp('TCP FAIL');
     end
+    clear cnt;
 end
 
 %if ~ispc
